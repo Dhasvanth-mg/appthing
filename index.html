@@ -29,8 +29,8 @@
     --accent-2:#ffc4dc;
     --shadow: 0 26px 50px -22px rgba(214,90,145,0.38);
     --shadow-sm: 0 10px 24px -14px rgba(214,90,145,0.32);
-    --dur-fly:.55s;
-    --dur-fly-fade:.2s;
+    --dur-fly:.85s;
+    --dur-fly-fade:.25s;
     --dur-spring:.32s;
   }
   @media (prefers-reduced-motion: reduce){
@@ -171,7 +171,7 @@
     /* Glide off at full opacity so the Red/Green Flag stamp stays readable,
        and only fade in the last stretch of the flight. */
     transition:
-      transform var(--dur-fly) cubic-bezier(.16,1,.3,1),
+      transform var(--dur-fly) ease,
       opacity var(--dur-fly-fade) linear calc(var(--dur-fly) - var(--dur-fly-fade));
   }
   .card.springback{ transition:transform var(--dur-spring) cubic-bezier(.2,.8,.3,1.2); }
@@ -801,7 +801,7 @@
       resolveCase(dir, caseData);
     }
     card.addEventListener("transitionend", done);
-    setTimeout(done, 650);
+    setTimeout(done, 950);
   }
 
   function commitTop(dir){
