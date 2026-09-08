@@ -739,7 +739,8 @@
     var startX=0, startY=0, dx=0, dy=0, active=false, pointerId=null;
     var stampRed = card.querySelector(".stamp-red");
     var stampGreen = card.querySelector(".stamp-green");
-    var THRESHOLD = 90;
+    var THRESHOLD = 90; // recalculated per-drag from the card's actual width
+    var lastMoveX=0, lastMoveT=0, velocity=0; // px/ms, for flick detection
 
     function onDown(e){
       if (verdictEl.hidden === false) return;
@@ -749,6 +750,11 @@
       pointerId = e.pointerId;
       card.classList.remove("springback","entering");
       startX = e.clientX; startY = e.clientY;
+      lastMoveX = e.clientX; lastMoveT = performance.now(); velocity = 0;
+      // A quarter of the card's own width feels right on any screen size —
+      // fixed pixel thresholds felt too stiff on a full-size iPad.
+      var w = card.getBoundingClientRect().width || 380;
+      THRESHOLD = Math.max(56, Math.min(100, w * 0.24));
       // Claim the gesture so iPadOS treats this as a drag, not a page
       // scroll / text-selection / callout gesture.
       if (e.cancelable) e.preventDefault();
@@ -759,6 +765,10 @@
       if (e.cancelable) e.preventDefault();
       dx = e.clientX - startX;
       dy = e.clientY - startY;
+      var now = performance.now();
+      var dt = now - lastMoveT;
+      if (dt > 0){ velocity = (e.clientX - lastMoveX) / dt; }
+      lastMoveX = e.clientX; lastMoveT = now;
       var rot = dx/18;
       card.style.transform = "translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg)";
       var rightAmt = Math.max(0, Math.min(1, dx/THRESHOLD));
@@ -770,7 +780,10 @@
       if (!active || (e && e.pointerId !== pointerId)) return;
       active = false;
       dragging = false;
-      if (Math.abs(dx) > THRESHOLD){
+      // Commit on distance OR a quick flick — a fast short swipe shouldn't
+      // need to travel a quarter of the card to register.
+      var isFlick = Math.abs(velocity) > 0.5 && Math.abs(dx) > 24;
+      if (Math.abs(dx) > THRESHOLD || isFlick){
         var dir = dx > 0 ? "red" : "green";
         flyAway(card, dir, caseData);
       } else {
