@@ -28,7 +28,8 @@
     --accent-2:#ff8fb3;
     --shadow: 0 24px 46px -20px rgba(214,32,110,0.4);
     --shadow-sm: 0 10px 22px -12px rgba(214,32,110,0.38);
-    --dur-fly:.38s;
+    --dur-fly:.7s;
+    --dur-fly-fade:.25s;
     --dur-spring:.32s;
   }
   @media (prefers-color-scheme: dark){
@@ -74,7 +75,7 @@
     --shadow-sm: 0 10px 22px -12px rgba(0,0,0,0.55);
   }
   @media (prefers-reduced-motion: reduce){
-    :root{ --dur-fly:.01s; --dur-spring:.01s; }
+    :root{ --dur-fly:.01s; --dur-fly-fade:.01s; --dur-spring:.01s; }
   }
 
   *{box-sizing:border-box;}
@@ -205,7 +206,13 @@
     will-change:transform;
   }
   .card:active{ cursor:grabbing; }
-  .card.flying{ transition:transform var(--dur-fly) cubic-bezier(.4,0,.6,1), opacity var(--dur-fly) linear; }
+  .card.flying{
+    /* Glide off at full opacity so the Red/Green Flag stamp stays readable,
+       and only fade in the last stretch of the flight. */
+    transition:
+      transform var(--dur-fly) cubic-bezier(.3,0,.55,1),
+      opacity var(--dur-fly-fade) linear calc(var(--dur-fly) - var(--dur-fly-fade));
+  }
   .card.springback{ transition:transform var(--dur-spring) cubic-bezier(.2,.8,.3,1.2); }
   .card.entering{ transition:transform .28s cubic-bezier(.2,.7,.3,1.1), opacity .28s; }
 
@@ -828,7 +835,7 @@
       resolveCase(dir, caseData);
     }
     card.addEventListener("transitionend", done);
-    setTimeout(done, 450);
+    setTimeout(done, 780);
   }
 
   function commitTop(dir){
