@@ -8,71 +8,30 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap">
 <style>
+  /* A single, deliberately pastel look — no light/dark switching. */
   :root{
-    color-scheme: light dark;
-    --bg:#ffe9f2;
-    --bg-dot: rgba(255,45,120,0.09);
-    --surface:#fffbfd;
+    color-scheme: light;
+    --bg-top:#fff6fa;
+    --bg-bottom:#ffdcec;
+    --surface:#fffcfd;
     --surface-2:#ffedf5;
-    --ink:#4a1236;
-    --ink-soft:#8a4a72;
-    --ink-faint:#c98cae;
-    --line:#ffc9e1;
-    --red:#ff2f76;
-    --red-soft:#ffd9e7;
-    --red-ink:#c2185b;
-    --green:#2fbb9c;
-    --green-soft:#d3f5ec;
-    --green-ink:#178064;
-    --accent:#ff2f76;
-    --accent-2:#ff8fb3;
-    --shadow: 0 24px 46px -20px rgba(214,32,110,0.4);
-    --shadow-sm: 0 10px 22px -12px rgba(214,32,110,0.38);
+    --ink:#7a3757;
+    --ink-soft:#a5637f;
+    --ink-faint:#dba9c0;
+    --line:#ffd6e7;
+    --red:#ff93b7;
+    --red-soft:#ffe4ef;
+    --red-ink:#d1567e;
+    --green:#8fdcc3;
+    --green-soft:#e3f8f0;
+    --green-ink:#3f9b7c;
+    --accent:#ff8fb1;
+    --accent-2:#ffc4dc;
+    --shadow: 0 26px 50px -22px rgba(214,90,145,0.38);
+    --shadow-sm: 0 10px 24px -14px rgba(214,90,145,0.32);
     --dur-fly:.7s;
     --dur-fly-fade:.25s;
     --dur-spring:.32s;
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --bg:#2b0f24;
-      --bg-dot: rgba(255,140,190,0.08);
-      --surface:#3b1832;
-      --surface-2:#472040;
-      --ink:#ffe6f3;
-      --ink-soft:#e3aecb;
-      --ink-faint:#a97494;
-      --line:#5d2b4e;
-      --red:#ff6693;
-      --red-soft:#5c2440;
-      --red-ink:#ffb8d4;
-      --green:#4fdcb7;
-      --green-soft:#1d3f39;
-      --green-ink:#9bf1da;
-      --accent:#ff6693;
-      --accent-2:#ff9ec2;
-      --shadow: 0 24px 46px -20px rgba(0,0,0,0.6);
-      --shadow-sm: 0 10px 22px -12px rgba(0,0,0,0.55);
-    }
-  }
-  :root[data-theme="dark"]{
-    --bg:#2b0f24;
-    --bg-dot: rgba(255,140,190,0.08);
-    --surface:#3b1832;
-    --surface-2:#472040;
-    --ink:#ffe6f3;
-    --ink-soft:#e3aecb;
-    --ink-faint:#a97494;
-    --line:#5d2b4e;
-    --red:#ff6693;
-    --red-soft:#5c2440;
-    --red-ink:#ffb8d4;
-    --green:#4fdcb7;
-    --green-soft:#1d3f39;
-    --green-ink:#9bf1da;
-    --accent:#ff6693;
-    --accent-2:#ff9ec2;
-    --shadow: 0 24px 46px -20px rgba(0,0,0,0.6);
-    --shadow-sm: 0 10px 22px -12px rgba(0,0,0,0.55);
   }
   @media (prefers-reduced-motion: reduce){
     :root{ --dur-fly:.01s; --dur-fly-fade:.01s; --dur-spring:.01s; }
@@ -82,8 +41,9 @@
   html,body{margin:0;padding:0;overscroll-behavior-y:contain;}
   body{
     background:
-      radial-gradient(var(--bg-dot) 2.2px, transparent 2.2px) 0 0/28px 28px,
-      var(--bg);
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M36 55s-15-9.5-15-20.5A8.5 8.5 0 0 1 36 29a8.5 8.5 0 0 1 15 5.5C51 45.5 36 55 36 55Z' fill='none' stroke='%23ffcfe2' stroke-width='1.6'/%3E%3C/svg%3E") 0 0/72px 72px,
+      linear-gradient(165deg, var(--bg-top) 0%, #ffeaf3 45%, var(--bg-bottom) 100%);
+    background-attachment: fixed;
     color:var(--ink);
     font-family:"Quicksand", ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing:antialiased;
@@ -126,7 +86,7 @@
     text-wrap:balance;
   }
   h1 em{
-    color:var(--accent);
+    color:var(--red-ink);
     font-style:normal;
     font-family:"Caveat", cursive;
     font-weight:700;
@@ -193,8 +153,9 @@
     inset:0;
     background:var(--surface);
     border:1px solid var(--line);
+    background-image: linear-gradient(165deg, #ffffff, var(--surface) 55%, #fff2f8);
     border-radius:26px;
-    box-shadow:var(--shadow);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), var(--shadow);
     padding:22px 22px 20px;
     display:flex;
     flex-direction:column;
@@ -244,7 +205,7 @@
     font-weight:700;
     letter-spacing:.03em;
     color:var(--red-ink);
-    background:var(--surface-2);
+    background-image: linear-gradient(135deg, var(--surface-2), #ffe0ee);
     border:1px solid var(--line);
     border-radius:999px;
     padding:3px 10px;
@@ -281,7 +242,7 @@
     padding:7px 14px;
     border:3px solid currentColor;
     border-radius:14px;
-    background:var(--surface);
+    box-shadow: var(--shadow-sm);
     font-family:"Fredoka", ui-rounded, sans-serif;
     font-weight:700;
     font-size:19px;
@@ -291,8 +252,8 @@
     pointer-events:none;
   }
   .stamp svg{ width:18px; height:18px; flex-shrink:0; }
-  .stamp-red{ right:20px; color:var(--red); transform:rotate(10deg); }
-  .stamp-green{ left:20px; color:var(--green); transform:rotate(-10deg); }
+  .stamp-red{ right:20px; color:var(--red-ink); background:var(--red-soft); transform:rotate(10deg); }
+  .stamp-green{ left:20px; color:var(--green-ink); background:var(--green-soft); transform:rotate(-10deg); }
 
   .controls{
     display:flex;
@@ -308,7 +269,7 @@
     padding:12px 22px;
     border-radius:999px;
     border:1.5px solid var(--line);
-    background:var(--surface);
+    background-image: linear-gradient(165deg, #ffffff, var(--surface-2));
     color:var(--ink);
     cursor:pointer;
     box-shadow:var(--shadow-sm);
@@ -347,7 +308,7 @@
   .verdict{
     position:fixed;
     inset:0;
-    background:rgba(58,15,45,0.45);
+    background:rgba(178,80,130,0.32);
     backdrop-filter:blur(2px);
     display:flex;
     align-items:center;
@@ -357,10 +318,10 @@
   }
   .verdict-card{
     width:min(100%,380px);
-    background:var(--surface);
+    background-image: linear-gradient(165deg, #ffffff, var(--surface) 55%, #fff2f8);
     border:1px solid var(--line);
     border-radius:26px;
-    box-shadow:var(--shadow);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), var(--shadow);
     padding:28px 26px 24px;
     text-align:center;
     animation:pop .22s cubic-bezier(.2,.8,.3,1.2);
@@ -403,7 +364,7 @@
     font-family:"Quicksand", sans-serif;
     font-weight:700;
     font-size:14px;
-    color:#fff;
+    color:var(--ink);
     background:linear-gradient(135deg, var(--accent), var(--accent-2));
     border:none;
     border-radius:999px;
@@ -449,7 +410,7 @@
     justify-content:center;
   }
   .metric{
-    background:var(--surface);
+    background-image: linear-gradient(165deg, #ffffff, var(--surface-2));
     border:1px solid var(--line);
     border-radius:18px;
     padding:14px 20px;
@@ -476,7 +437,7 @@
     font-family:"Quicksand", sans-serif;
     font-weight:700;
     font-size:15px;
-    color:#fff;
+    color:var(--ink);
     background:linear-gradient(135deg, var(--accent), var(--accent-2));
     border:none;
     border-radius:999px;
@@ -675,7 +636,7 @@
   var bestChip = document.getElementById("bestChip");
   var bestVal = document.getElementById("bestVal");
 
-  var deck, total, answered, correctCount, redCorrect, greenCorrect, dragging;
+  var deck, total, answered, correctCount, redCorrect, greenCorrect, dragging, pendingDir, resolvedForCurrent;
 
   function getBest(){
     try{ return parseInt(localStorage.getItem("rfgf_best")||"", 10); }catch(e){ return NaN; }
