@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Red Flag, Green Flag</title>
+<meta name="description" content="A Tinder-style swipe drill built from Dubai Health's OB/GYN case flashcards — swipe right to escalate a red flag, left to reassure a green flag.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap">
+<style>
+  :root{
+    color-scheme: light dark;
+    --bg:#ffe9f2;
+    --bg-dot: rgba(255,45,120,0.09);
+    --surface:#fffbfd;
+    --surface-2:#ffedf5;
+    --ink:#4a1236;
+    --ink-soft:#8a4a72;
+    --ink-faint:#c98cae;
+    --line:#ffc9e1;
+    --red:#ff2f76;
+    --red-soft:#ffd9e7;
+    --red-ink:#c2185b;
+    --green:#2fbb9c;
+    --green-soft:#d3f5ec;
+    --green-ink:#178064;
+    --accent:#ff2f76;
+    --accent-2:#ff8fb3;
+    --shadow: 0 24px 46px -20px rgba(214,32,110,0.4);
+    --shadow-sm: 0 10px 22px -12px rgba(214,32,110,0.38);
+    --dur-fly:.38s;
+    --dur-spring:.32s;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#2b0f24;
+      --bg-dot: rgba(255,140,190,0.08);
+      --surface:#3b1832;
+      --surface-2:#472040;
+      --ink:#ffe6f3;
+      --ink-soft:#e3aecb;
+      --ink-faint:#a97494;
+      --line:#5d2b4e;
+      --red:#ff6693;
+      --red-soft:#5c2440;
+      --red-ink:#ffb8d4;
+      --green:#4fdcb7;
+      --green-soft:#1d3f39;
+      --green-ink:#9bf1da;
+      --accent:#ff6693;
+      --accent-2:#ff9ec2;
+      --shadow: 0 24px 46px -20px rgba(0,0,0,0.6);
+      --shadow-sm: 0 10px 22px -12px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#2b0f24;
+    --bg-dot: rgba(255,140,190,0.08);
+    --surface:#3b1832;
+    --surface-2:#472040;
+    --ink:#ffe6f3;
+    --ink-soft:#e3aecb;
+    --ink-faint:#a97494;
+    --line:#5d2b4e;
+    --red:#ff6693;
+    --red-soft:#5c2440;
+    --red-ink:#ffb8d4;
+    --green:#4fdcb7;
+    --green-soft:#1d3f39;
+    --green-ink:#9bf1da;
+    --accent:#ff6693;
+    --accent-2:#ff9ec2;
+    --shadow: 0 24px 46px -20px rgba(0,0,0,0.6);
+    --shadow-sm: 0 10px 22px -12px rgba(0,0,0,0.55);
+  }
+  @media (prefers-reduced-motion: reduce){
+    :root{ --dur-fly:.01s; --dur-spring:.01s; }
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;overscroll-behavior-y:contain;}
+  body{
+    background:
+      radial-gradient(var(--bg-dot) 2.2px, transparent 2.2px) 0 0/28px 28px,
+      var(--bg);
+    color:var(--ink);
+    font-family:"Quicksand", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .app{
+    max-width:640px;
+    margin:0 auto;
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    padding:20px 18px 28px;
+  }
+
+  /* ---------- header ---------- */
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:16px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:22px;
+  }
+  .eyebrow{
+    display:block;
+    font-family:"Quicksand", sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.12em;
+    color:var(--ink-faint);
+    margin-bottom:4px;
+  }
+  h1{
+    font-family:"Fredoka", ui-rounded, sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,5.5vw,34px);
+    line-height:1.05;
+    margin:0;
+    text-wrap:balance;
+  }
+  h1 em{
+    color:var(--accent);
+    font-style:normal;
+    font-family:"Caveat", cursive;
+    font-weight:700;
+    font-size:1.18em;
+    display:inline-block;
+    transform:rotate(-3deg);
+  }
+  .tagline{
+    display:block;
+    font-family:"Caveat", cursive;
+    font-weight:600;
+    font-size:16px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .stats{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+    flex-shrink:0;
+  }
+  .progress-label{
+    font-family:"Quicksand", sans-serif;
+    font-weight:700;
+    font-size:12px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+    letter-spacing:.03em;
+  }
+  .dots{ display:flex; gap:4px; }
+  .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--line);
+  }
+  .dot.done-red{ background:var(--red); }
+  .dot.done-green{ background:var(--green); }
+  .best-chip{
+    font-family:"Quicksand", sans-serif;
+    font-weight:600;
+    font-size:11px;
+    color:var(--ink-faint);
+    letter-spacing:.04em;
+  }
+  .best-chip strong{ color:var(--ink-soft); }
+
+  /* ---------- deck ---------- */
+  .deck-wrap{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    gap:22px;
+  }
+  .deck{
+    position:relative;
+    width:min(100%, 380px);
+    height:490px;
+    touch-action:none;
+  }
+  .card{
+    position:absolute;
+    inset:0;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:26px;
+    box-shadow:var(--shadow);
+    padding:22px 22px 20px;
+    display:flex;
+    flex-direction:column;
+    cursor:grab;
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+    will-change:transform;
+  }
+  .card:active{ cursor:grabbing; }
+  .card.flying{ transition:transform var(--dur-fly) cubic-bezier(.4,0,.6,1), opacity var(--dur-fly) linear; }
+  .card.springback{ transition:transform var(--dur-spring) cubic-bezier(.2,.8,.3,1.2); }
+  .card.entering{ transition:transform .28s cubic-bezier(.2,.7,.3,1.1), opacity .28s; }
+
+  .card-id{
+    font-family:"Quicksand", sans-serif;
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:.1em;
+    color:var(--ink-faint);
+    display:flex;
+    justify-content:space-between;
+  }
+  .card h2{
+    font-family:"Fredoka", ui-rounded, sans-serif;
+    font-size:20px;
+    font-weight:600;
+    margin:8px 0 10px;
+    color:var(--ink);
+  }
+  .vitals{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:14px;
+  }
+  .vital{
+    font-family:"Quicksand", sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.03em;
+    color:var(--red-ink);
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:3px 10px;
+  }
+  .vignette{
+    font-size:15px;
+    font-weight:500;
+    line-height:1.55;
+    color:var(--ink-soft);
+    overflow-y:auto;
+    flex:1;
+  }
+  .vignette p{ margin:0 0 10px; }
+  .vignette p:last-child{ margin-bottom:0; }
+  .card-footer{
+    margin-top:14px;
+    padding-top:12px;
+    border-top:2px dashed var(--line);
+    font-family:"Quicksand", sans-serif;
+    font-weight:700;
+    font-size:11px;
+    color:var(--ink-faint);
+    display:flex;
+    justify-content:space-between;
+    letter-spacing:.03em;
+  }
+
+  .stamp{
+    position:absolute;
+    top:26px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:7px 14px;
+    border:3px solid currentColor;
+    border-radius:14px;
+    background:var(--surface);
+    font-family:"Fredoka", ui-rounded, sans-serif;
+    font-weight:700;
+    font-size:19px;
+    letter-spacing:.02em;
+    text-transform:uppercase;
+    opacity:0;
+    pointer-events:none;
+  }
+  .stamp svg{ width:18px; height:18px; flex-shrink:0; }
+  .stamp-red{ right:20px; color:var(--red); transform:rotate(10deg); }
+  .stamp-green{ left:20px; color:var(--green); transform:rotate(-10deg); }
+
+  .controls{
+    display:flex;
+    gap:16px;
+  }
+  .ctrl{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:"Quicksand", sans-serif;
+    font-size:14px;
+    font-weight:700;
+    padding:12px 22px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:var(--surface);
+    color:var(--ink);
+    cursor:pointer;
+    box-shadow:var(--shadow-sm);
+    transition:transform .12s ease, border-color .12s ease, background .12s ease;
+  }
+  .ctrl:hover{ transform:translateY(-2px); }
+  .ctrl:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .ctrl svg{ width:17px; height:17px; flex-shrink:0; }
+  .ctrl-green{ color:var(--green-ink); }
+  .ctrl-green:hover{ border-color:var(--green); background:var(--green-soft); }
+  .ctrl-red{ color:var(--red-ink); }
+  .ctrl-red:hover{ border-color:var(--red); background:var(--red-soft); }
+
+  .hint{
+    font-family:"Quicksand", sans-serif;
+    font-weight:600;
+    font-size:12px;
+    color:var(--ink-faint);
+    letter-spacing:.02em;
+    margin:0;
+    text-align:center;
+  }
+
+  .foot-brand{
+    text-align:center;
+    font-family:"Quicksand", sans-serif;
+    font-weight:700;
+    font-size:10px;
+    letter-spacing:.14em;
+    color:var(--ink-faint);
+    opacity:.7;
+    margin-top:22px;
+  }
+
+  /* ---------- verdict overlay ---------- */
+  .verdict{
+    position:fixed;
+    inset:0;
+    background:rgba(58,15,45,0.45);
+    backdrop-filter:blur(2px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:20;
+  }
+  .verdict-card{
+    width:min(100%,380px);
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:26px;
+    box-shadow:var(--shadow);
+    padding:28px 26px 24px;
+    text-align:center;
+    animation:pop .22s cubic-bezier(.2,.8,.3,1.2);
+  }
+  @keyframes pop{ from{ transform:scale(.92); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  .verdict-icon{
+    width:48px; height:48px;
+    border-radius:50%;
+    margin:0 auto 14px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+    font-weight:700;
+  }
+  .verdict-icon.correct{ background:var(--green-soft); color:var(--green-ink); }
+  .verdict-icon.wrong{ background:var(--red-soft); color:var(--red-ink); }
+  .verdict-tag{
+    font-family:"Quicksand", sans-serif;
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:.1em;
+    color:var(--ink-faint);
+    margin:0 0 6px;
+  }
+  .verdict-card h2{
+    font-family:"Fredoka", ui-rounded, sans-serif;
+    font-size:21px;
+    margin:0 0 10px;
+    text-wrap:balance;
+  }
+  .verdict-card h2.tone-red{ color:var(--red-ink); }
+  .verdict-card h2.tone-green{ color:var(--green-ink); }
+  .verdict-text{
+    font-size:14.5px;
+    font-weight:500;
+    line-height:1.55;
+    color:var(--ink-soft);
+    margin:0 0 20px;
+  }
+  .btn-continue{
+    font-family:"Quicksand", sans-serif;
+    font-weight:700;
+    font-size:14px;
+    color:#fff;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    border:none;
+    border-radius:999px;
+    padding:12px 26px;
+    cursor:pointer;
+    box-shadow:var(--shadow-sm);
+  }
+  .btn-continue:focus-visible{ outline:2px solid var(--ink); outline-offset:2px; }
+
+  /* ---------- summary ---------- */
+  .summary{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:6px;
+    padding:20px 0;
+  }
+  .summary .eyebrow{ text-align:center; }
+  .score-big{
+    font-family:"Fredoka", ui-rounded, sans-serif;
+    font-weight:700;
+    font-size:clamp(56px,16vw,86px);
+    line-height:1;
+    margin:8px 0 4px;
+    color:var(--accent);
+    font-variant-numeric:tabular-nums;
+  }
+  .score-msg{
+    font-size:16px;
+    font-weight:500;
+    color:var(--ink-soft);
+    max-width:38ch;
+    margin:0 0 26px;
+  }
+  .metrics{
+    display:flex;
+    gap:14px;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .metric{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:14px 20px;
+    min-width:140px;
+    box-shadow:var(--shadow-sm);
+  }
+  .metric-label{
+    font-family:"Quicksand", sans-serif;
+    font-weight:700;
+    font-size:10.5px;
+    letter-spacing:.08em;
+    color:var(--ink-faint);
+    margin-bottom:6px;
+  }
+  .metric-value{
+    font-family:"Fredoka", ui-rounded, sans-serif;
+    font-weight:600;
+    font-size:26px;
+  }
+  .metric-value.red{ color:var(--red-ink); }
+  .metric-value.green{ color:var(--green-ink); }
+  .metric-sub{ font-size:11.5px; font-weight:500; color:var(--ink-faint); margin-top:2px; }
+  .btn-restart{
+    font-family:"Quicksand", sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:#fff;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    border:none;
+    border-radius:999px;
+    padding:14px 30px;
+    cursor:pointer;
+    box-shadow:var(--shadow-sm);
+  }
+  .btn-restart:focus-visible{ outline:2px solid var(--ink); outline-offset:2px; }
+
+  [hidden]{ display:none !important; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="eyebrow">DUBAI HEALTH · OB/GYN TRIAGE DRILL</span>
+      <h1>Red Flag, <em>Green Flag</em></h1>
+      <span class="tagline">swipe like it's your situationship</span>
+    </div>
+    <div class="stats">
+      <span class="progress-label" id="progressLabel">CASE 1 / 11</span>
+      <div class="dots" id="dots"></div>
+      <span class="best-chip" id="bestChip" hidden>Best run <strong id="bestVal"></strong></span>
+    </div>
+  </header>
+
+  <main class="deck-wrap" id="playArea">
+    <div class="deck" id="deck"></div>
+    <div class="controls">
+      <button class="ctrl ctrl-green" id="btnGreen" type="button" aria-label="Green flag — reassure, manage routinely">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2s-7.2-4.4-9.7-9C.8 8 1.6 4.6 4.4 3.4c2.4-1 5 .1 6.3 2.3.4.6.9 1.5 1.3 2.1.4-.6.9-1.5 1.3-2.1 1.3-2.2 3.9-3.3 6.3-2.3 2.8 1.2 3.6 4.6 2.1 7.8-2.5 4.6-9.7 9-9.7 9Z"/></svg>
+        <span>Reassure</span>
+      </button>
+      <button class="ctrl ctrl-red" id="btnRed" type="button" aria-label="Red flag — urgent, escalate now">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3 v18"/><path d="M6 4 h12 l-3 4 l3 4 h-12"/></svg>
+        <span>Escalate</span>
+      </button>
+    </div>
+    <p class="hint">Drag the card — or tap a button — or press ← / →</p>
+    <p class="foot-brand">DUBAI HEALTH — INTERNAL USE — TRAINING SIMULATION</p>
+  </main>
+
+  <section class="summary" id="summary" hidden>
+    <span class="eyebrow">ROUND COMPLETE</span>
+    <div class="score-big" id="finalScore">0/11</div>
+    <p class="score-msg" id="finalMsg"></p>
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">SENSITIVITY</div>
+        <div class="metric-value red" id="sensVal">0/7</div>
+        <div class="metric-sub">red flags caught</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">SPECIFICITY</div>
+        <div class="metric-value green" id="specVal">0/4</div>
+        <div class="metric-sub">safely reassured</div>
+      </div>
+    </div>
+    <button class="btn-restart" id="btnRestart" type="button">Shuffle &amp; run again</button>
+  </section>
+</div>
+
+<div class="verdict" id="verdict" hidden role="alertdialog" aria-modal="true">
+  <div class="verdict-card">
+    <div class="verdict-icon" id="verdictIcon"></div>
+    <p class="verdict-tag" id="verdictTag"></p>
+    <h2 id="verdictTitle"></h2>
+    <p class="verdict-text" id="verdictText"></p>
+    <button class="btn-continue" id="btnContinue" type="button">Next case →</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var CASES = [
+    { cat:"red", name:"Ectopic Pregnancy",
+      vitals:["27F","7WK AMENORRHEA","BP 88/55","HR 118"],
+      lines:[
+        "A 27-year-old presents with 7 weeks of amenorrhea and unilateral lower abdominal pain.",
+        "She has spotting and feels dizzy when standing.",
+        "BP is 88/55 mmHg and HR is 118 bpm."
+      ],
+      why:"Immediate assessment and intervention — this pattern of amenorrhea, unilateral pain and hypotensive tachycardia points to a suspected ruptured ectopic pregnancy." },
+    { cat:"red", name:"Postpartum Hemorrhage",
+      vitals:["20 MIN POSTPARTUM","UTERUS BOGGY","SYNCOPAL"],
+      lines:[
+        "A woman is 20 minutes postpartum after a vaginal delivery.",
+        "She suddenly develops heavy vaginal bleeding and feels faint.",
+        "Her uterus feels soft and boggy on abdominal examination."
+      ],
+      why:"Immediate management is required — heavy bleeding with a soft, boggy uterus is classic postpartum hemorrhage from uterine atony." },
+    { cat:"red", name:"Preeclampsia With Severe Features",
+      vitals:["34WK GA","BP 168/112 ×2","PROTEINURIA +","RUQ PAIN"],
+      lines:[
+        "A 34-week pregnant woman presents with a severe headache and blurred vision.",
+        "BP is 168/112 mmHg on two readings 15 minutes apart.",
+        "Urine protein is positive, and she reports right upper abdominal pain."
+      ],
+      why:"Urgent escalation is needed — severe-range BP plus proteinuria, visual symptoms and RUQ pain meet criteria for severe preeclampsia." },
+    { cat:"red", name:"Ovarian Torsion",
+      vitals:["22F","KNOWN CYST","SUDDEN UNILATERAL PAIN","N/V"],
+      lines:[
+        "A 22-year-old with a known ovarian cyst develops sudden, severe unilateral pelvic pain.",
+        "She has nausea and vomiting but no vaginal bleeding.",
+        "Examination reveals marked unilateral adnexal tenderness."
+      ],
+      why:"Urgent gynecological assessment is needed — sudden unilateral pain on a known cyst, with nausea and adnexal tenderness, is a classic torsion picture." },
+    { cat:"red", name:"Placental Abruption",
+      vitals:["32WK GA","RIGID UTERUS","FETAL TACHYCARDIA"],
+      lines:[
+        "A 32-week pregnant woman presents with sudden severe abdominal pain.",
+        "She has vaginal bleeding and a tender, rigid uterus.",
+        "Fetal monitoring shows persistent fetal tachycardia."
+      ],
+      why:"This is an obstetric emergency — a tender rigid uterus with bleeding and fetal tachycardia signals placental abruption, threatening both lives." },
+    { cat:"red", name:"Shoulder Dystocia",
+      vitals:["ACTIVE LABOR","TURTLE SIGN","TRACTION FAILED"],
+      lines:[
+        "A woman is in active labor and the baby's head delivers, but the shoulders do not follow.",
+        "The baby's head retracts against the perineum after delivery.",
+        "The midwife calls for assistance and notes that gentle traction is unsuccessful."
+      ],
+      why:"This is an obstetric emergency requiring immediate maneuvers — the retracted head (“turtle sign”) and failed traction are hallmark shoulder dystocia." },
+    { cat:"red", name:"Molar Pregnancy",
+      vitals:["19F","12WK GA","SIZE > DATES","US: NO FETUS"],
+      lines:[
+        "A 19-year-old at 12 weeks' gestation presents with severe nausea and vaginal bleeding, and she's passing grape-like cysts from the vagina.",
+        "Her uterus is larger than expected for her gestational age.",
+        "Ultrasound shows no viable fetus and multiple small cystic spaces within the uterus."
+      ],
+      why:"Prompt gynecological assessment is needed — size-greater-than-dates with grape-like tissue and a snowstorm-pattern ultrasound is classic for molar pregnancy." },
+
+    { cat:"green", name:"Primary Dysmenorrhea",
+      vitals:["19F","CYCLE DAY 1–2","REGULAR CYCLES","RESPONDS TO NSAID"],
+      lines:[
+        "A 19-year-old gets crampy lower abdominal pain during the first 1–2 days of her period.",
+        "Her cycles are regular and the pain improves with ibuprofen.",
+        "Pelvic examination is normal with no concerning symptoms."
+      ],
+      why:"Conservative management is appropriate — regular cycles, a normal exam and relief with NSAIDs point to ordinary primary dysmenorrhea." },
+    { cat:"green", name:"Physiological Vaginal Discharge",
+      vitals:["21F","MID-CYCLE","NO ITCH / ODOR / PAIN"],
+      lines:[
+        "A 21-year-old notices increased clear-white vaginal discharge around the middle of her cycle.",
+        "There is no itching, burning, foul smell, or pelvic pain.",
+        "Her periods are regular and examination is unremarkable."
+      ],
+      why:"Reassurance is appropriate — mid-cycle clear-white discharge with no itch, odor or pain is normal physiological discharge, not infection." },
+    { cat:"green", name:"Stable Fibroids",
+      vitals:["38F","KNOWN FIBROIDS","HDS STABLE","MILD ANEMIA"],
+      lines:[
+        "A 38-year-old has heavy periods that have gradually increased over several months.",
+        "She has known uterine fibroids and mild iron-deficiency anemia.",
+        "She is hemodynamically stable with no acute pain or excessive current bleeding."
+      ],
+      why:"Outpatient gynecological management is appropriate — gradual heavy bleeding in a stable patient with known fibroids doesn't need emergency escalation." },
+    { cat:"green", name:"Braxton Hicks vs True Labor",
+      vitals:["35WK GA","IRREGULAR TIGHTENING","FHR NORMAL"],
+      lines:[
+        "A woman at 35 weeks reports occasional abdominal tightening throughout the day.",
+        "The contractions are irregular and do not become stronger or closer together.",
+        "There is no vaginal bleeding or fluid leakage, and fetal movements are normal."
+      ],
+      why:"Reassurance is appropriate — irregular, non-progressing tightening with normal fetal movement and no bleeding is Braxton Hicks, not true labor." }
+  ];
+  var RED_TOTAL = CASES.filter(function(c){ return c.cat==="red"; }).length;
+  var GREEN_TOTAL = CASES.length - RED_TOTAL;
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for (var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  var deckEl = document.getElementById("deck");
+  var dotsEl = document.getElementById("dots");
+  var progressLabel = document.getElementById("progressLabel");
+  var playArea = document.getElementById("playArea");
+  var summaryEl = document.getElementById("summary");
+  var verdictEl = document.getElementById("verdict");
+  var verdictIcon = document.getElementById("verdictIcon");
+  var verdictTag = document.getElementById("verdictTag");
+  var verdictTitle = document.getElementById("verdictTitle");
+  var verdictText = document.getElementById("verdictText");
+  var btnContinue = document.getElementById("btnContinue");
+  var btnGreen = document.getElementById("btnGreen");
+  var btnRed = document.getElementById("btnRed");
+  var btnRestart = document.getElementById("btnRestart");
+  var bestChip = document.getElementById("bestChip");
+  var bestVal = document.getElementById("bestVal");
+
+  var deck, total, answered, correctCount, redCorrect, greenCorrect, dragging;
+
+  function getBest(){
+    try{ return parseInt(localStorage.getItem("rfgf_best")||"", 10); }catch(e){ return NaN; }
+  }
+  function setBest(n){
+    try{
+      var prev = getBest();
+      if (isNaN(prev) || n > prev){ localStorage.setItem("rfgf_best", String(n)); return n; }
+      return prev;
+    }catch(e){ return n; }
+  }
+  (function initBest(){
+    var b = getBest();
+    if (!isNaN(b)){ bestVal.textContent = b + "/" + CASES.length; bestChip.hidden = false; }
+  })();
+
+  function buildDots(){
+    dotsEl.innerHTML = "";
+    for (var i=0;i<total;i++){
+      var d = document.createElement("span");
+      d.className = "dot";
+      dotsEl.appendChild(d);
+    }
+  }
+  function markDot(i, cat){
+    var d = dotsEl.children[i];
+    if (d) d.className = "dot done-" + cat;
+  }
+  function updateProgress(){
+    progressLabel.textContent = "CASE " + Math.min(answered+1, total) + " / " + total;
+  }
+
+  function cardMarkup(c, idx){
+    var wrap = document.createElement("div");
+    wrap.className = "card";
+    wrap.dataset.index = idx;
+
+    var vitalsHtml = c.vitals.map(function(v){ return '<span class="vital">'+v+'</span>'; }).join("");
+    var linesHtml = c.lines.map(function(l){ return "<p>"+l+"</p>"; }).join("");
+
+    wrap.innerHTML =
+      '<div class="card-id"><span>CASE ' + String(idx+1).padStart(2,"0") + '</span><span>OB / GYN</span></div>' +
+      '<h2>' + c.name + '</h2>' +
+      '<div class="vitals">' + vitalsHtml + '</div>' +
+      '<div class="vignette">' + linesHtml + '</div>' +
+      '<div class="card-footer"><span>← reassure</span><span>triage →</span></div>' +
+      '<div class="stamp stamp-green"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.2s-7.2-4.4-9.7-9C.8 8 1.6 4.6 4.4 3.4c2.4-1 5 .1 6.3 2.3.4.6.9 1.5 1.3 2.1.4-.6.9-1.5 1.3-2.1 1.3-2.2 3.9-3.3 6.3-2.3 2.8 1.2 3.6 4.6 2.1 7.8-2.5 4.6-9.7 9-9.7 9Z"/></svg>Green Flag</div>' +
+      '<div class="stamp stamp-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3 v18"/><path d="M6 4 h12 l-3 4 l3 4 h-12"/></svg>Red Flag</div>';
+    return wrap;
+  }
+
+  function renderDeck(){
+    deckEl.innerHTML = "";
+    var visible = deck.slice(0,3);
+    // append back-to-front so first child (top card) is topmost in DOM order at end
+    for (var i=visible.length-1;i>=0;i--){
+      var c = visible[i];
+      var el = cardMarkup(c, total-deck.length+i);
+      el.style.transform = "translateY(" + (i*10) + "px) scale(" + (1 - i*0.035) + ")";
+      el.style.zIndex = String(10-i);
+      el.style.opacity = i===2 ? "0.55" : "1";
+      deckEl.appendChild(el);
+      if (i===0){ el.dataset.top = "true"; attachDrag(el, c); }
+    }
+  }
+
+  function attachDrag(card, caseData){
+    var startX=0, startY=0, dx=0, dy=0, active=false, pointerId=null;
+    var stampRed = card.querySelector(".stamp-red");
+    var stampGreen = card.querySelector(".stamp-green");
+    var THRESHOLD = 90;
+
+    function onDown(e){
+      if (verdictEl.hidden === false) return;
+      if (active) return; // ignore a second finger mid-drag
+      active = true;
+      dragging = true;
+      pointerId = e.pointerId;
+      card.classList.remove("springback","entering");
+      startX = e.clientX; startY = e.clientY;
+      // Claim the gesture so iPadOS treats this as a drag, not a page
+      // scroll / text-selection / callout gesture.
+      if (e.cancelable) e.preventDefault();
+      try{ card.setPointerCapture(e.pointerId); }catch(err){}
+    }
+    function onMove(e){
+      if (!active || e.pointerId !== pointerId) return;
+      if (e.cancelable) e.preventDefault();
+      dx = e.clientX - startX;
+      dy = e.clientY - startY;
+      var rot = dx/18;
+      card.style.transform = "translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg)";
+      var rightAmt = Math.max(0, Math.min(1, dx/THRESHOLD));
+      var leftAmt = Math.max(0, Math.min(1, -dx/THRESHOLD));
+      stampRed.style.opacity = String(rightAmt);
+      stampGreen.style.opacity = String(leftAmt);
+    }
+    function onUp(e){
+      if (!active || (e && e.pointerId !== pointerId)) return;
+      active = false;
+      dragging = false;
+      if (Math.abs(dx) > THRESHOLD){
+        var dir = dx > 0 ? "red" : "green";
+        flyAway(card, dir, caseData);
+      } else {
+        card.classList.add("springback");
+        card.style.transform = "translate(0,0) rotate(0deg)";
+        stampRed.style.opacity = "0";
+        stampGreen.style.opacity = "0";
+      }
+      dx = 0; dy = 0;
+    }
+    card.addEventListener("pointerdown", onDown);
+    card.addEventListener("pointermove", onMove);
+    card.addEventListener("pointerup", onUp);
+    card.addEventListener("pointercancel", onUp);
+
+    card._manualCommit = function(dir){
+      flyAway(card, dir, caseData);
+    };
+  }
+
+  function flyAway(card, dir, caseData){
+    card.classList.add("flying");
+    card.style.pointerEvents = "none";
+    var x = dir === "red" ? 900 : -900;
+    var rot = dir === "red" ? 26 : -26;
+    card.style.transform = "translate(" + x + "px, -40px) rotate(" + rot + "deg)";
+    card.style.opacity = "0";
+    var settled = false;
+    function done(){
+      if (settled) return;
+      settled = true;
+      card.removeEventListener("transitionend", done);
+      resolveCase(dir, caseData);
+    }
+    card.addEventListener("transitionend", done);
+    setTimeout(done, 450);
+  }
+
+  function commitTop(dir){
+    var top = deckEl.querySelector('[data-top="true"]');
+    if (!top || !top._manualCommit) return;
+    top._manualCommit(dir);
+  }
+
+  function resolveCase(chosenDir, caseData){
+    var isCorrect = chosenDir === caseData.cat;
+    if (isCorrect) correctCount++;
+    if (caseData.cat === "red" && isCorrect) redCorrect++;
+    if (caseData.cat === "green" && isCorrect) greenCorrect++;
+    markDot(answered, caseData.cat);
+    answered++;
+    deck.shift();
+    showVerdict(isCorrect, caseData);
+  }
+
+  function showVerdict(isCorrect, caseData){
+    verdictIcon.className = "verdict-icon " + (isCorrect ? "correct" : "wrong");
+    verdictIcon.textContent = isCorrect ? "✓" : "✕";
+    verdictTag.textContent = caseData.cat === "red" ? "THIS WAS A RED FLAG" : "THIS WAS A GREEN FLAG";
+    verdictTitle.className = caseData.cat === "red" ? "tone-red" : "tone-green";
+    verdictTitle.textContent = isCorrect
+      ? (caseData.cat === "red" ? "Correctly escalated" : "Correctly reassured")
+      : (caseData.cat === "red" ? "Missed — needed escalation" : "Overcalled — didn't need escalation");
+    verdictText.textContent = caseData.why;
+    verdictEl.hidden = false;
+    btnContinue.focus();
+  }
+
+  btnContinue.addEventListener("click", function(){
+    verdictEl.hidden = true;
+    updateProgress();
+    if (deck.length === 0){
+      finish();
+    } else {
+      renderDeck();
+    }
+  });
+
+  btnGreen.addEventListener("click", function(){ if (verdictEl.hidden) commitTop("green"); });
+  btnRed.addEventListener("click", function(){ if (verdictEl.hidden) commitTop("red"); });
+
+  window.addEventListener("keydown", function(e){
+    if (summaryEl.hidden === false) return;
+    if (!verdictEl.hidden){
+      if (e.key === "Enter" || e.key === " "){ e.preventDefault(); btnContinue.click(); }
+      return;
+    }
+    if (e.key === "ArrowRight"){ commitTop("red"); }
+    if (e.key === "ArrowLeft"){ commitTop("green"); }
+  });
+
+  function finish(){
+    playArea.hidden = true;
+    summaryEl.hidden = false;
+    var best = setBest(correctCount);
+    bestVal.textContent = best + "/" + CASES.length;
+    bestChip.hidden = false;
+
+    document.getElementById("finalScore").textContent = correctCount + "/" + total;
+    document.getElementById("sensVal").textContent = redCorrect + "/" + RED_TOTAL;
+    document.getElementById("specVal").textContent = greenCorrect + "/" + GREEN_TOTAL;
+
+    var msg;
+    if (correctCount === total){ msg = "Attending-level instincts — every red flag caught, every green flag left alone."; }
+    else if (correctCount >= total - 2){ msg = "Sharp judgment — only a couple of cases slipped past you."; }
+    else if (correctCount >= total - 5){ msg = "Solid foundation. Worth a second pass on the ones you missed."; }
+    else { msg = "Time to restudy the red flags before rounds — several emergencies got waved through."; }
+    document.getElementById("finalMsg").textContent = msg;
+  }
+
+  function start(){
+    deck = shuffle(CASES);
+    total = deck.length;
+    answered = 0; correctCount = 0; redCorrect = 0; greenCorrect = 0;
+    playArea.hidden = false;
+    summaryEl.hidden = true;
+    verdictEl.hidden = true;
+    buildDots();
+    updateProgress();
+    renderDeck();
+  }
+
+  btnRestart.addEventListener("click", start);
+
+  start();
+})();
+</script>
+</body>
+</html>
