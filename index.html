@@ -29,8 +29,8 @@
     --accent-2:#ffc4dc;
     --shadow: 0 26px 50px -22px rgba(214,90,145,0.38);
     --shadow-sm: 0 10px 24px -14px rgba(214,90,145,0.32);
-    --dur-fly:.7s;
-    --dur-fly-fade:.25s;
+    --dur-fly:.55s;
+    --dur-fly-fade:.2s;
     --dur-spring:.32s;
   }
   @media (prefers-reduced-motion: reduce){
@@ -171,7 +171,7 @@
     /* Glide off at full opacity so the Red/Green Flag stamp stays readable,
        and only fade in the last stretch of the flight. */
     transition:
-      transform var(--dur-fly) cubic-bezier(.3,0,.55,1),
+      transform var(--dur-fly) cubic-bezier(.16,1,.3,1),
       opacity var(--dur-fly-fade) linear calc(var(--dur-fly) - var(--dur-fly-fade));
   }
   .card.springback{ transition:transform var(--dur-spring) cubic-bezier(.2,.8,.3,1.2); }
@@ -784,6 +784,11 @@
   function flyAway(card, dir, caseData){
     card.classList.add("flying");
     card.style.pointerEvents = "none";
+    // A quick flick can commit well before the drag distance ramped the
+    // stamp to full opacity — snap it to fully visible now so the flag
+    // reads clearly on every commit, not just a full deliberate drag.
+    var stamp = card.querySelector(dir === "red" ? ".stamp-red" : ".stamp-green");
+    if (stamp) stamp.style.opacity = "1";
     var x = dir === "red" ? 900 : -900;
     var rot = dir === "red" ? 26 : -26;
     card.style.transform = "translate(" + x + "px, -40px) rotate(" + rot + "deg)";
@@ -796,7 +801,7 @@
       resolveCase(dir, caseData);
     }
     card.addEventListener("transitionend", done);
-    setTimeout(done, 780);
+    setTimeout(done, 650);
   }
 
   function commitTop(dir){
