@@ -186,14 +186,8 @@
     display:flex;
     justify-content:space-between;
   }
-  .card h2{
-    font-family:"Fredoka", ui-rounded, sans-serif;
-    font-size:20px;
-    font-weight:600;
-    margin:8px 0 10px;
-    color:var(--ink);
-  }
   .vitals{
+    margin-top:12px;
     display:flex;
     flex-wrap:wrap;
     gap:6px;
@@ -337,6 +331,13 @@
   }
   .verdict-icon.correct{ background:var(--green-soft); color:var(--green-ink); }
   .verdict-icon.wrong{ background:var(--red-soft); color:var(--red-ink); }
+  .verdict-name{
+    font-family:"Fredoka", ui-rounded, sans-serif;
+    font-size:20px;
+    font-weight:600;
+    color:var(--ink);
+    margin:0 0 4px;
+  }
   .verdict-tag{
     font-family:"Quicksand", sans-serif;
     font-weight:700;
@@ -505,6 +506,7 @@
 <div class="verdict" id="verdict" hidden role="alertdialog" aria-modal="true">
   <div class="verdict-card">
     <div class="verdict-icon" id="verdictIcon"></div>
+    <p class="verdict-name" id="verdictName"></p>
     <p class="verdict-tag" id="verdictTag"></p>
     <h2 id="verdictTitle"></h2>
     <p class="verdict-text" id="verdictText"></p>
@@ -626,6 +628,7 @@
   var summaryEl = document.getElementById("summary");
   var verdictEl = document.getElementById("verdict");
   var verdictIcon = document.getElementById("verdictIcon");
+  var verdictName = document.getElementById("verdictName");
   var verdictTag = document.getElementById("verdictTag");
   var verdictTitle = document.getElementById("verdictTitle");
   var verdictText = document.getElementById("verdictText");
@@ -677,9 +680,10 @@
     var vitalsHtml = c.vitals.map(function(v){ return '<span class="vital">'+v+'</span>'; }).join("");
     var linesHtml = c.lines.map(function(l){ return "<p>"+l+"</p>"; }).join("");
 
+    // The diagnosis name is deliberately withheld here — it only appears
+    // on the verdict screen, after the swipe, so it can't give the answer away.
     wrap.innerHTML =
       '<div class="card-id"><span>CASE ' + String(idx+1).padStart(2,"0") + '</span><span>OB / GYN</span></div>' +
-      '<h2>' + c.name + '</h2>' +
       '<div class="vitals">' + vitalsHtml + '</div>' +
       '<div class="vignette">' + linesHtml + '</div>' +
       '<div class="card-footer"><span>← reassure</span><span>triage →</span></div>' +
@@ -824,6 +828,7 @@
   function showVerdict(isCorrect, caseData){
     verdictIcon.className = "verdict-icon " + (isCorrect ? "correct" : "wrong");
     verdictIcon.textContent = isCorrect ? "✓" : "✕";
+    verdictName.textContent = caseData.name;
     verdictTag.textContent = caseData.cat === "red" ? "THIS WAS A RED FLAG" : "THIS WAS A GREEN FLAG";
     verdictTitle.className = caseData.cat === "red" ? "tone-red" : "tone-green";
     verdictTitle.textContent = isCorrect
